@@ -3,240 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Playerok Отзывы</title>
-    <!-- Подключаем официальный скрипт Telegram Web App -->
+    <title>Отзывы Playerok</title>
     <script src="https://telegram.org"></script>
     <style>
-        /* Базовые стили темной премиальной темы Playerok */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0d0f1a;
-            color: #ffffff;
-            margin: 0;
-            padding: 16px;
-            padding-bottom: 30px;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #0b0f1a; color: #ffffff; padding: 16px; user-select: none; }
+        
         /* Главная градиентная карточка статистики */
-        .stats-card {
-            background: linear-gradient(135deg, #1c1a3a 0%, #15224e 100%);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+        .stats-card { background: linear-gradient(135deg, #1c2a3a 0%, #15224e 100%); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); }
+        .stats-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .logo-placeholder { width: 48px; height: 48px; background-color: #0052ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; margin-right: 12px; box-shadow: 0 0 12px rgba(0,82,255,0.4); }
+        .title-block h1 { font-size: 22px; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.5px; }
+        .title-block p { font-size: 12px; color: #8fa0b5; }
+        
+        /* Сетка показателей */
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-box { background-color: rgba(22,34,53,0.7); border-radius: 14px; padding: 14px 4px; text-align: center; border: 1px solid rgba(255,255,255,0.02); }
+        .stat-value { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .stat-label { font-size: 10px; color: #73879c; }
 
-        .stats-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        /* Блок управления кнопками */
+        .action-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn { flex: 1; border: none; border-radius: 14px; padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s, opacity 0.2s; }
+        .btn:active { opacity: 0.8; }
+        .btn-refresh { background-color: #162235; color: #ffffff; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-add { background: linear-gradient(90deg, #635bff 0%, #5144f6 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(99,91,255,0.3); }
 
-        .logo-box {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #0052ff 0%, #00d2ff 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 22px;
-            margin-right: 14px;
-            box-shadow: 0 4px 12px rgba(0,82,255,0.4);
-        }
+        /* Список отзывов пользователей */
+        .reviews-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .review-item { background-color: #12192c; border-radius: 16px; padding: 16px; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .review-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .user-meta { display: flex; align-items: center; gap: 10px; }
+        .avatar-placeholder { width: 38px; height: 36px; background-color: #242f48; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #a4b3cd; font-size: 18px; }
+        .user-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; color: #ffffff; }
+        .review-date { font-size: 11px; color: #697c92; }
+        .stars { color: #ffb703; font-size: 11px; letter-spacing: 1px; }
+        .review-text { font-size: 13px; color: #e2e8f0; line-height: 1.4; padding-left: 2px; }
 
-        .title-box h1 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .title-box p {
-            margin: 2px 0 0 0;
-            font-size: 13px;
-            color: #8fa0dd;
-        }
-
-        /* Сетка показателей 3 в ряд */
-        .stats-grid {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .stat-item {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 14px;
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.02);
-        }
-
-        .stat-val {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .stat-lbl {
-            font-size: 11px;
-            color: #7b88b6;
-        }
-
-        /* Блок кнопок управления под шапкой */
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: opacity 0.2s;
-        }
-
-        .btn:active {
-            opacity: 0.7;
-        }
-
-        .btn-refresh {
-            background-color: #161926;
-            color: #ffffff;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .btn-leave {
-            background: linear-gradient(90deg, #5b61ff 0%, #4046ff 100%);
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(64,70,255,0.3);
-        }
-
-        /* Лента отзыва-карточек со скриншотов */
-        .reviews-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .review-card {
-            background-color: #131622;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.03);
-        }
-
-        .review-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .avatar {
-            width: 36px;
-            height: 36px;
-            background-color: #202438;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-        }
-
-        .avatar svg {
-            width: 18px;
-            height: 18px;
-            fill: #616c8c;
-        }
-
-        .user-name {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .review-date {
-            font-size: 12px;
-            color: #5d6585;
-        }
-
-        .stars {
-            color: #ffaa00;
-            font-size: 13px;
-            letter-spacing: 1px;
-        }
-
-        .review-text {
-            font-size: 14px;
-            color: #d1d5e3;
-            line-height: 1.4;
-            margin: 0;
-            padding-left: 48px;
-        }
+        /* Подпись в самом низу */
+        .footer-tag { text-align: center; font-size: 12px; color: #435470; margin-top: 15px; padding-bottom: 15px; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-    <!-- 📊 ШАПКА СТАТИСТИКИ -->
+    <!-- 🗂️ Верхняя карточка со статистикой -->
     <div class="stats-card">
         <div class="stats-header">
-            <div class="logo-box">Pl</div>
-            <div class="title-box">
+            <div class="logo-placeholder">PI</div>
+            <div class="title-block">
                 <h1>Отзывы</h1>
                 <p>Что говорят пользователи о сделках</p>
             </div>
         </div>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-val">958</div>
-                <div class="stat-lbl">отзывов</div>
+        <div class="grid-stats">
+            <div class="stat-box">
+                <div class="stat-value">958</div>
+                <div class="stat-label">отзывов</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-val">4.8</div>
-                <div class="stat-lbl">средняя оценка</div>
+            <div class="stat-box">
+                <div class="stat-value">4.8</div>
+                <div class="stat-label">средняя оценка</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-val">24/7</div>
-                <div class="stat-lbl">сделки</div>
+            <div class="stat-box">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">сделки</div>
             </div>
         </div>
     </div>
 
-    <!-- 🔘 КНОПКИ ДЕЙСТВИЙ -->
+    <!-- 🛠️ Ряд функциональных кнопок -->
     <div class="action-buttons">
         <button class="btn btn-refresh" onclick="window.location.reload();">🔄 Обновить</button>
-        <button class="btn btn-leave" onclick="leaveReview();">✦ Оставить отзыв</button>
+        <button class="btn btn-add" onclick="addNewReviewPrompt();">✦ Оставить отзыв</button>
     </div>
 
-    <!-- 💬 БЕСКОНЕЧНЫЙ СПИСОК ОТЗЫВОВ ИЗ СКРИНШОТОВ -->
-    <div class="reviews-container">
+    <!-- 💬 ПОЛНЫЙ СПИСОК ОТЗЫВОВ ОДИН В ОДИН СО СКРИНШОТОВ -->
+    <div class="reviews-list" id="reviewsContainer">
         
-        <!-- Скриншот 4 -->
-        <div class="review-card">
+        <!-- Скриншот 6 -->
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">19 окт. 2026 г.</div>
@@ -244,13 +92,13 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">Все прошло успешно</p>
+            <div class="review-text">Ок норм все)</div>
         </div>
 
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">19 окт. 2026 г.</div>
@@ -258,59 +106,14 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">Ок норм все)</p>
+            <div class="review-text">всё отлично прошло рекомендую)</div>
         </div>
 
-        <div class="review-card">
+        <!-- Скриншот 5 & 6 -->
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-                    <div>
-                        <div class="user-name">Пользователь</div>
-                        <div class="review-date">19 окт. 2026 г.</div>
-                    </div>
-                </div>
-                <div class="stars">★★★★☆</div>
-            </div>
-            <p class="review-text">благодарю за работу</p>
-        </div>
-
-        <div class="review-card">
-            <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-                    <div>
-                        <div class="user-name">Пользователь</div>
-                        <div class="review-date">19 окт. 2026 г.</div>
-                    </div>
-                </div>
-                <div class="stars">★★★★★</div>
-            </div>
-            <p class="review-text">всё отлично прошло рекомендую)</p>
-        </div>
-
-        <div class="review-card">
-            <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-                    <div>
-                        <div class="user-name">Пользователь</div>
-                        <div class="review-date">19 окт. 2026 г.</div>
-                    </div>
-                </div>
-                <div class="stars">★★★★★</div>
-            </div>
-            <p class="review-text">Ну четко, спасибо</p>
-        </div>
-
-        <!-- Скриншот 1 -->
-        <div class="review-card">
-            <div class="review-top">
-                <div class="user-info"><!-- Отзывы из Скриншота №1 -->
-        <div class="review-card">
-            <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">18 окт. 2026 г.</div>
@@ -318,13 +121,105 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">спс огромное)</p>
+            <div class="review-text">Атах ну быстро же</div>
         </div>
 
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★☆</div>
+            </div>
+            <div class="review-text">деньги получил, подарок передал, все норм</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">первый опыт - всё отлично</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">ровно</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">второй раз обращаюсь, никаких проблем</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">норм прошло всё, без базара</div>
+        </div>
+
+        <!-- Скриншот 4 -->
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">18 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">спс огромное)</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div class="review-text">Деньги пришли спасибо большое</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">17 окт. 2026 г.</div>
@@ -332,13 +227,13 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">Деньги пришли спасибо большое</p>
+            <div class="review-text">Норм гарант попался</div>
         </div>
 
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">17 окт. 2026 г.</div>
@@ -346,14 +241,27 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">Норм гарант попался</p>
+            <div class="review-text">Благодарствую</div>
         </div>
 
-        <!-- Отзывы из Скриншота №2 -->
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">17 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★☆</div>
+            </div>
+            <div class="review-text">Всё быстро рекомендую</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">16 окт. 2026 г.</div>
@@ -361,13 +269,13 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">Ахах думал минут 20, а тут 3</p>
+            <div class="review-text">всё хорошо никаких претензий</div>
         </div>
 
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">16 окт. 2026 г.</div>
@@ -375,14 +283,83 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">всё хорошо никаких претензий</p>
+            <div class="review-text">Деньги получены, доволен</div>
         </div>
 
-        <!-- Отзывы из Скриншота №3 -->
-        <div class="review-card">
+        <div class="review-item">
             <div class="review-top">
-                <div class="user-info">
-                    <div class="avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">16 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★☆</div>
+            </div>
+            <div class="review-text">спасибо 💛</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">16 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">ну наконец то</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">16 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">все четко без вопросов</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">16 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">ровно всё</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">15 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★☆</div>
+            </div>
+            <div class="review-text">норм, рекомендую</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
                     <div>
                         <div class="user-name">Пользователь</div>
                         <div class="review-date">15 окт. 2026 г.</div>
@@ -390,21 +367,132 @@
                 </div>
                 <div class="stars">★★★★★</div>
             </div>
-            <p class="review-text">пришло быстрее чем я переоделся лол</p>
+            <div class="review-text">😷</div>
         </div>
 
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">15 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">пришло быстрее чем я переоделся лол</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">15 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">Сделка быстрая, деньги на карте</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">15 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★☆</div>
+            </div>
+            <div class="review-text">Спс)</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">15 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">Всё четко и честно</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">14 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">благодарю за оперативность</div>
+        </div>
+
+        <div class="review-item">
+            <div class="review-top">
+                <div class="user-meta">
+                    <div class="avatar-placeholder">👤</div>
+                    <div>
+                        <div class="user-name">Пользователь</div>
+                        <div class="review-date">14 окт. 2026 г.</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+            </div>
+            <div class="review-text">все нормик</div>
+        </div>
     </div>
 
-    <!-- 🌐 Скрипт интеграции Telegram Web App -->
+    <!-- 🏷️ Тэг твоего бота -->
+    <div class="footer-tag">@Playerokin_bot</div>
+
     <script>
-        // Инициализация Telegram Web App интерфейса
+        // Интеграция с Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand(); // Раскрываем окно Mini App на весь экран смартфона
+        tg.expand();
 
-        function leaveReview() {
-            // Всплывающее нативное окно Telegram с алертом из ТЗ
-            tg.showAlert("✍️ Оставлять отзывы могут только пользователи после завершения P2P сделки!");
+        function addNewReviewPrompt() {
+            const text = prompt("Введите ваш отзыв о маркетплейсе Playerok:");
+            if (!text || text.trim() === "") return;
+
+            const container = document.getElementById("reviewsContainer");
+            const newItem = document.createElement("div");
+            newItem.className = "review-item";
+            
+            const now = new Date();
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            const formattedDate = now.toLocaleDateString('ru-RU', options);
+
+            newItem.innerHTML = `
+                <div class="review-top">
+                    <div class="user-meta">newItem.innerHTML = `
+                <div class="review-top">
+                    <div class="user-meta">
+                        <div class="avatar-placeholder">👤</div>
+                        <div>
+                            <div class="user-name">Пользователь</div>
+                            <div class="review-date">${formattedDate}</div>
+                        </div>
+                    </div>
+                    <div class="stars">★★★★★</div>
+                </div>
+                <div class="review-text">${text}</div>
+            `;
+            container.insertBefore(newItem, container.firstChild);
+            alert("✨ Ваш отзыв успешно опубликован в системе маркетплейса!");
         }
     </script>
 </body>
